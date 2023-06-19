@@ -6,12 +6,13 @@ import time
 import json
 
 
-def knn(csv_file, distance_type = "euclidean", p = None, k = 5, data = [], latitude = None, longitude = None, age = None, weight = None, hour = None, athmo = None, surf = None, lum = None, agglo = None):
+def knn(csv_file, distance_type = "euclidean", p = None, k = 11, data = [], latitude = None, longitude = None, age = None, weight = None, hour = None, athmo = None, surf = None, lum = None, agglo = None):
   df = pd.read_csv(csv_file, sep = ";")
   df.drop(columns = ['Num_Acc', 'num_veh', 'id_usa', 'date', 'ville', 'id_code_insee', 'descr_cat_veh', 'descr_agglo', 'descr_athmo', 'descr_lum', 'descr_etat_surf', 'description_intersection', 'descr_dispo_secu', 'descr_grav', 'descr_motif_traj', 'descr_type_col', 'an_nais', 'place', 'dept', 'region', 'CODE_REG', 'weeks', 'month', 'days', 'intersection_num', 'motif_num', 'collision_num'], inplace = True)
 
   labels = df.loc[:, 'gravity'].to_frame()
   df.drop(columns = ['gravity'], inplace = True)
+  df["weight"] /= 1000
 
   n = len(df)
   distances = []
@@ -50,33 +51,39 @@ def knn(csv_file, distance_type = "euclidean", p = None, k = 5, data = [], latit
 
   json_object = json.dumps(return_dict, indent = 4) 
 
-  return json_object
+  # return json_object
+  return(sum/k, n)
 
-print(knn("data/stat_acc_V3.csv", distance_type = "hamming", p = 2, k = 5, data = [47.321009, -1.435293, 21, 1000, 14, 0, 0, 0, 0]))
+# print(knn("data/stat_acc_V3.csv", distance_type = "euclidean", data = [47.633331, 6.86667, 21, 1, 14, 6, 7, 4, 1]))
 
 
-# find the best k -> k = 5
+# find the best k -> k = 11
 
-# arr_mean = []
-# arr_best = []
-# k = [*range(3, 16, 4)]
-# for i in range(3, 16, 4):
-#   print("k =", i)
-#   sum_mean = 0
-#   sum_best = 0
-#   for j in range(30):
-#     g = df.iloc[j]["gravity"]
-#     test = knn('data/stat_acc_V3.csv', k=i, data = df.iloc[j].drop(labels = ["gravity"]).array)
-#     sum_mean += abs(g-test[0])
-#     if (g != test[1]):
-#       sum_best += 1
-#   arr_mean.append(sum_mean / 30)
-#   arr_best.append(sum_best / 30)
+df = pd.read_csv("data/stat_acc_V3.csv", sep = ";")
+df.drop(columns = ['Num_Acc', 'num_veh', 'id_usa', 'date', 'ville', 'id_code_insee', 'descr_cat_veh', 'descr_agglo', 'descr_athmo', 'descr_lum', 'descr_etat_surf', 'description_intersection', 'descr_dispo_secu', 'descr_grav', 'descr_motif_traj', 'descr_type_col', 'an_nais', 'place', 'dept', 'region', 'CODE_REG', 'weeks', 'month', 'days', 'intersection_num', 'motif_num', 'collision_num'], inplace = True)
+df["weight"] /= 1000
+df = df.sample(frac=1).reset_index(drop=True)
 
-# print(arr_mean)
-# print(arr_best)
+arr_mean = []
+arr_best = []
+k = [*range(3, 22, 4)]
+for i in range(3, 22, 4):
+  print("k =", i)
+  sum_mean = 0
+  sum_best = 0
+  for j in range(10):
+    g = df.iloc[j]["gravity"]
+    test = knn('data/stat_acc_V3.csv', k=i, data = df.iloc[j].drop(labels = ["gravity"]).array)
+    sum_mean += abs(g-test[0])
+    if (g != test[1]):
+      sum_best += 1
+  arr_mean.append(sum_mean / 10)
+  arr_best.append(sum_best / 10)
 
-# plt.plot(k, arr_mean)
-# plt.plot(k, arr_best)
+print(arr_mean)
+print(arr_best)
 
-# plt.show()
+plt.plot(k, arr_mean)
+plt.plot(k, arr_best)
+
+plt.show()
