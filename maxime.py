@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 from numpy import sin, cos, arccos, pi, round
 from sklearn.cluster import KMeans
 import time
+from sklearn.metrics import silhouette_score
+from sklearn.metrics import calinski_harabasz_score
+from sklearn.metrics import davies_bouldin_score
 
 
 def rad2deg(radians):
@@ -91,7 +94,6 @@ def KMEANS(k,df, nb_iteration = 10,methode=3,mink=2):
 
             min_dist = min(dist_table)
             clusters_you_are_in.append(min_dist[1])
-
         table_lat = []
         table_lon = []
 
@@ -107,8 +109,8 @@ def KMEANS(k,df, nb_iteration = 10,methode=3,mink=2):
             table_lat = []
             table_lon = []
         # print("Coordonnées des clusters à l'iteration", p, " : " ,clusters)
-    
-    return clusters
+    test = [clusters,clusters_you_are_in]
+    return test
 
 
 def fit_departement(df):
@@ -152,30 +154,102 @@ def plot_clusters(df,clusters,path):
     plt.ylabel('latitude et longitude')
     plt.savefig(path)
 
+def metrics_test(df):
+
+    path_silouhette1 = 'export/silouhette_sklearn.png'
+    path_silouhette2 = 'export/silouhette_scratch.png'
+    path_calinski1 = 'export/calinski_sklearn.png'
+    path_calinski2 = 'export/calinski_scratch.png'
+    path_davies1 = 'export/davies_sklearn.png'
+    path_davies2 = 'export/davies_scratch.png'
+
+    for i in range(6):
+        kmeans = KMeans(n_clusters=i+2, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
+        silouhette = silhouette_score(df[["latitude","longitude"]], kmeans.labels_)
+        plt.plot(i+2,silouhette,'-gs')
+    plt.ylabel('score silouette')
+    plt.savefig(path_silouhette1)
+    plt.close()
+
+    for i in range(6):
+        result = KMEANS(i+2,df, nb_iteration=2,methode=1)
+        labels = result[1]
+        silouhette = silhouette_score(df[["latitude","longitude"]], labels)
+        plt.plot(i+2,silouhette,'-gs')
+    plt.ylabel('score silouette')
+    plt.savefig(path_silouhette2)
+    plt.close()
+    print("silouhette ok")
+    for i in range(6):
+        kmeans = KMeans(n_clusters=i+2, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
+        calinski = calinski_harabasz_score(df[["latitude","longitude"]], kmeans.labels_)
+        print("calinski score : ", calinski)
+        plt.plot(i+2,calinski,'-gs')
+    plt.ylabel('score calinski')
+    plt.savefig(path_calinski1)
+    plt.close()
+
+    for i in range(6):
+        result = KMEANS(i+2,df, nb_iteration=2,methode=1)
+        labels = result[1]
+        calinski = calinski_harabasz_score(df[["latitude","longitude"]], labels)
+        plt.plot(i+2,calinski,'-gs')
+    plt.ylabel('score calinski')
+    plt.savefig(path_calinski2)
+    plt.close()
+    print("calinski ok")
+
+    for i in range(6):
+        kmeans = KMeans(n_clusters=i+2, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
+        davies = davies_bouldin_score(df[["latitude","longitude"]], kmeans.labels_)
+        plt.plot(i+2,davies,'-gs')
+    plt.ylabel('score davies')
+    plt.savefig(path_davies1)
+    plt.close()
+
+    for i in range(6):
+        result = KMEANS(i+2,df, nb_iteration=2,methode=1)
+        labels = result[1]
+        davies = davies_bouldin_score(df[["latitude","longitude"]], labels)
+        plt.plot(i+2,davies,'-gs')
+    plt.ylabel('score davies')
+    plt.savefig(path_davies2)
+    plt.close()
+    print("davies ok")
+
 
 df = pd.read_csv('data/stat_acc_V3.csv', sep =";")  
 print("data loaded !")  
 df = fit_departement(df)
 print("data fitted !")
-st = time.time()
-clusters = KMEANS(5,df, 10,methode=1)
-et = time.time()
-elapsed_time = et - st
-print('Execution time manual:', elapsed_time, 'seconds')
+# plt.plot(df["longitude"], df["latitude"], '-gs',)
+# plt.show()
+metrics_test(df)
+# st = time.time()
+# result = KMEANS(5,df, nb_iteration=3,methode=1)
+# et = time.time()
+# elapsed_time = et - st
+# clusters = result[0]
+# labels = result[1]
+# print('Execution time manual:', elapsed_time, 'seconds')
 # print(clusters)
 # print("KMEANS ok !")
-# print("final clusters : ", clusters)
-print("plotting clusters ...")
-plot_clusters(df,clusters,'export/manuel.png')
-print("plotting done !")
-plt.close()
-st = time.time()
-kmeans = KMeans(n_clusters=5, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
-et = time.time()
-elapsed_time = et - st
-print('Execution time sklearn:', elapsed_time, 'seconds')
+# # print("final clusters : ", clusters)
+# print("plotting clusters ...")
+# plot_clusters(df,clusters,'export/manuel.png')
+# print("plotting done !")
+# plt.close()
+
+# st = time.time()
+# kmeans = KMeans(n_clusters=5, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
+# et = time.time()
+# elapsed_time = et - st
+# print('Execution time sklearn:', elapsed_time, 'seconds')
 
 # print(kmeans.cluster_centers_)
-plot_clusters(df,kmeans.cluster_centers_,'export/sklearn.png')
-plt.close()
+# plot_clusters(df,kmeans.cluster_centers_,'export/sklearn.png')
+# plt.close()
+# silouhette = silhouette_score(df[["latitude","longitude"]], kmeans.labels_)
+# print("silouhette score : ", silouhette)
+# print(kmeans.labels_)
 
