@@ -222,9 +222,9 @@ df = pd.read_csv('data/stat_acc_V3.csv', sep =";")
 print("data loaded !")  
 df = fit_departement(df)
 print("data fitted !")
-# plt.plot(df["longitude"], df["latitude"], '-gs',)
-# plt.show()
-metrics_test(df)
+
+# metrics_test(df)
+
 # st = time.time()
 # result = KMEANS(5,df, nb_iteration=3,methode=1)
 # et = time.time()
@@ -232,13 +232,19 @@ metrics_test(df)
 # clusters = result[0]
 # labels = result[1]
 # print('Execution time manual:', elapsed_time, 'seconds')
-# print(clusters)
-# print("KMEANS ok !")
-# # print("final clusters : ", clusters)
-# print("plotting clusters ...")
-# plot_clusters(df,clusters,'export/manuel.png')
-# print("plotting done !")
-# plt.close()
+
+tab_paths = ['export/manual_2_clusters.png','export/manual_3_clusters.png','export/manual_4_clusters.png','export/manual_5_clusters.png','export/manual_6_clusters.png']
+tab_paths2 = ['export/sklearn_2_clusters.png','export/sklearn_3_clusters.png','export/sklearn_4_clusters.png','export/sklearn_5_clusters.png','export/sklearn_6_clusters.png']
+for i in range(5):
+    result = KMEANS(i+2,df, nb_iteration=3,methode=1)
+    clusters = result[0]
+    result = KMeans(n_clusters=i+2, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
+    clusters2 = result.cluster_centers_
+    plot_clusters(df,clusters,tab_paths[i])
+    plt.close()
+    plot_clusters(df,clusters2,tab_paths2[i])
+    plt.close()
+
 
 # st = time.time()
 # kmeans = KMeans(n_clusters=5, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
