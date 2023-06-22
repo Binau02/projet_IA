@@ -13,6 +13,11 @@ from sklearn.metrics import silhouette_score
 from sklearn.metrics import calinski_harabasz_score
 from sklearn.metrics import davies_bouldin_score
 
+import sklearn as sk
+import numpy as np
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import StandardScaler
+
 def rad2deg(radians):
     degrees = radians * 180 / pi
     return degrees
@@ -32,14 +37,14 @@ def appartient_cluster(lat,lon, clusters):
 
     min_dist = min(dist_table)
     index = min_dist[1]
-    # return index
 
     # créer un fichier json qui contient les coordonnées du cluster auquel appartient le point
     aDict = {"lat_centroides":clusters[index][0], "lon_centroides":clusters[index][1]}
     jsonString = json.dumps(aDict)
-    jsonFile = open("cluster.json", "w")
-    jsonFile.write(jsonString)
-    jsonFile.close()
+    return jsonString
+    # jsonFile = open("cluster.json", "w")
+    # jsonFile.write(jsonString)
+    # jsonFile.close()
 
 
 def KMEANS(k,df, nb_iteration = 10,methode=3,mink=2):
@@ -207,9 +212,10 @@ def metrics_test(df):
 
 # fit data
 df = pd.read_csv('data/stat_acc_V3.csv', sep =";")  
-print("data loaded !")  
-df = fit_departement(df)
-print("data fitted !")
+
+# print("data loaded !")  
+# df = fit_departement(df)
+# print("data fitted !")
 
 # faire les tests de metrics
 
@@ -230,25 +236,88 @@ print("data fitted !")
 #     plt.close()
 
 
-# comparer les temps d'execution
+def compare_execution_time(df):
+    st = time.time()
+    result = KMEANS(5,df, nb_iteration=1,methode=1)
+    et = time.time()
+    elapsed_time = et - st
+    print('Execution time manual:', elapsed_time, 'seconds')
+    st = time.time()
+    kmeans = KMeans(n_clusters=5, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
+    et = time.time()
+    elapsed_time = et - st
+    print('Execution time sklearn:', elapsed_time, 'seconds')
 
-st = time.time()
-kmeans = KMeans(n_clusters=5, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
-et = time.time()
-elapsed_time = et - st
-print('Execution time sklearn:', elapsed_time, 'seconds')
-print(kmeans.cluster_centers_)
-appartient_cluster(df["latitude"][10000],df["longitude"][10000],kmeans.cluster_centers_)
+######### PCA #########
 
+data = pd.DataFrame(df)
 
-# st = time.time()
-# result = KMEANS(5,df, nb_iteration=1,methode=1)
-# et = time.time()
-# elapsed_time = et - st
-# clusters = result[0]
-# labels = result[1]
-# print(clusters)
-# print(labels)
-# print('Execution time manual:', elapsed_time, 'seconds')
+# ça nous avance pas bcp
+data.drop('Num_Acc', inplace=True, axis=1)
+data.drop('id_usa', inplace=True, axis=1)
+data.drop('date', inplace=True, axis=1)
+# sinon ça marche po
+data.drop('num_veh', inplace=True, axis=1)
+data.drop('ville', inplace=True, axis=1)
+data.drop('id_code_insee', inplace=True, axis=1)
+data.drop('descr_cat_veh', inplace=True, axis=1)
+data.drop('descr_agglo', inplace=True, axis=1)
+data.drop('descr_athmo', inplace=True, axis=1)
+data.drop('descr_lum', inplace=True, axis=1)
+data.drop('descr_etat_surf', inplace=True, axis=1)
+data.drop('description_intersection', inplace=True, axis=1)
+data.drop('descr_dispo_secu', inplace=True, axis=1)
+data.drop('descr_grav', inplace=True, axis=1)
+data.drop('descr_motif_traj', inplace=True, axis=1)
+data.drop('descr_type_col', inplace=True, axis=1)
+data.drop('dept', inplace=True, axis=1)
+data.drop('region', inplace=True, axis=1)
+data.drop('CODE_REG', inplace=True, axis=1)
 
+print(data.head())
 
+from sklearn import *
+
+x, y = data.drop(columns=["gravity"]), data.gravity
+
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.5)
+
+from sklearn.preprocessing import StandardScaler
+
+features = ['athmo_num', 'etat_surf_num', 'lum_num', 'weight', 'age']
+x = data.loc[:, features].values
+y = data.loc[:,['gravity']].values
+
+scaler = StandardScaler()
+x = scaler.fit_transform(x)
+
+from sklearn.decomposition import PCA
+pca = PCA(n_components=2)
+x_reduit = pca.fit_transform(x)
+
+principalDf = pd.DataFrame(data = x_reduit, columns = ['principal component 1', 'principal component 2'])
+finalDf = pd.concat([principalDf, data[['gravity']]], axis = 1)
+
+"""Visualisation"""
+
+import matplotlib.pyplot as plt
+
+fig = plt.figure(figsize = (8,8))
+ax = fig.add_subplot(1,1,1)
+ax.set_xlabel('Principal Component 1', fontsize = 15)
+ax.set_ylabel('Principal Component 2', fontsize = 15)
+ax.set_title('2 component PCA', fontsize = 20)
+
+targets = [2, 5, 10]
+colors = ['g', 'b', 'r']
+for target, color in zip(targets,colors):
+    indicesToKeep = finalDf['gravity'] == target
+    ax.scatter(finalDf.loc[indicesToKeep, 'principal component 1']
+               , finalDf.loc[indicesToKeep, 'principal component 2']
+               , c = color
+               , s = 50)
+ax.legend(targets)
+ax.grid()
+plt.savefig('export/pca.png')
+plt.close()
