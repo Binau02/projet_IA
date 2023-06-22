@@ -206,10 +206,10 @@ def metrics_test(df):
     print("davies ok")
 
 # fit data
-df = pd.read_csv('data/stat_acc_V3.csv', sep =";")  
-print("data loaded !")  
-df = fit_departement(df)
-print("data fitted !")
+# df = pd.read_csv('data/stat_acc_V3.csv', sep =";")  
+# print("data loaded !")  
+# df = fit_departement(df)
+# print("data fitted !")
 
 # faire les tests de metrics
 
@@ -232,14 +232,13 @@ print("data fitted !")
 
 # comparer les temps d'execution
 
-st = time.time()
-kmeans = KMeans(n_clusters=5, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
-et = time.time()
-elapsed_time = et - st
-print('Execution time sklearn:', elapsed_time, 'seconds')
-print(kmeans.cluster_centers_)
-appartient_cluster(df["latitude"][10000],df["longitude"][10000],kmeans.cluster_centers_)
-
+# st = time.time()
+# kmeans = KMeans(n_clusters=5, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
+# et = time.time()
+# elapsed_time = et - st
+# print('Execution time sklearn:', elapsed_time, 'seconds')
+# print(kmeans.cluster_centers_)
+# appartient_cluster(df["latitude"][10000],df["longitude"][10000],kmeans.cluster_centers_)
 
 # st = time.time()
 # result = KMEANS(5,df, nb_iteration=1,methode=1)
