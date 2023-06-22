@@ -59,6 +59,37 @@ def knn(csv_file, distance_type = "euclidean", p = None, k = 11, data = [], lati
 
 # find the best k -> k = 11
 
+# df = pd.read_csv("data/stat_acc_V3.csv", sep = ";")
+# df.drop(columns = ['Num_Acc', 'num_veh', 'id_usa', 'date', 'ville', 'id_code_insee', 'descr_cat_veh', 'descr_agglo', 'descr_athmo', 'descr_lum', 'descr_etat_surf', 'description_intersection', 'descr_dispo_secu', 'descr_grav', 'descr_motif_traj', 'descr_type_col', 'an_nais', 'place', 'dept', 'region', 'CODE_REG', 'weeks', 'month', 'days', 'intersection_num', 'motif_num', 'collision_num'], inplace = True)
+# df["weight"] /= 1000
+# df = df.sample(frac=1).reset_index(drop=True)
+
+# arr_mean = []
+# arr_best = []
+# k = [*range(3, 22, 4)]
+# for i in range(3, 22, 4):
+#   print("k =", i)
+#   sum_mean = 0
+#   sum_best = 0
+#   for j in range(10):
+#     g = df.iloc[j]["gravity"]
+#     test = knn('data/stat_acc_V3.csv', k=i, data = df.iloc[j].drop(labels = ["gravity"]).array)
+#     sum_mean += abs(g-test[0])
+#     if (g != test[1]):
+#       sum_best += 1
+#   arr_mean.append(sum_mean / 10)
+#   arr_best.append(sum_best / 10)
+
+# print(arr_mean)
+# print(arr_best)
+
+# plt.plot(k, arr_mean)
+# plt.plot(k, arr_best)
+
+# plt.show()
+
+
+
 df = pd.read_csv("data/stat_acc_V3.csv", sep = ";")
 df.drop(columns = ['Num_Acc', 'num_veh', 'id_usa', 'date', 'ville', 'id_code_insee', 'descr_cat_veh', 'descr_agglo', 'descr_athmo', 'descr_lum', 'descr_etat_surf', 'description_intersection', 'descr_dispo_secu', 'descr_grav', 'descr_motif_traj', 'descr_type_col', 'an_nais', 'place', 'dept', 'region', 'CODE_REG', 'weeks', 'month', 'days', 'intersection_num', 'motif_num', 'collision_num'], inplace = True)
 df["weight"] /= 1000
@@ -66,8 +97,8 @@ df = df.sample(frac=1).reset_index(drop=True)
 
 arr_mean = []
 arr_best = []
-k = [*range(3, 22, 4)]
-for i in range(3, 22, 4):
+k = [*range(11, 12)]
+for i in range(11, 12):
   print("k =", i)
   sum_mean = 0
   sum_best = 0
@@ -82,8 +113,3 @@ for i in range(3, 22, 4):
 
 print(arr_mean)
 print(arr_best)
-
-plt.plot(k, arr_mean)
-plt.plot(k, arr_best)
-
-plt.show()
