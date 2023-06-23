@@ -12,11 +12,13 @@ from sklearn.model_selection import train_test_split, cross_val_score, LeaveOneO
 
 
 def knn(csv_file, distance_type = "euclidean", p = None, k = 11, data = [], latitude = None, longitude = None, age = None, weight = None, hour = None, athmo = None, surf = None, lum = None, agglo = None):
+  # string to array for argv
   if type(data) == "str":
     data = data.replace('[', '')
     data = data.replace(']', '')
     data = data.split(',')
 
+  # read csv and fit data
   df = pd.read_csv(csv_file, sep = ";")
   df.drop(columns = ['Num_Acc', 'num_veh', 'id_usa', 'date', 'ville', 'id_code_insee', 'descr_cat_veh', 'descr_agglo', 'descr_athmo', 'descr_lum', 'descr_etat_surf', 'description_intersection', 'descr_dispo_secu', 'descr_grav', 'descr_motif_traj', 'descr_type_col', 'an_nais', 'place', 'dept', 'region', 'CODE_REG', 'weeks', 'month', 'days', 'intersection_num', 'motif_num', 'collision_num'], inplace = True)
 
@@ -24,6 +26,7 @@ def knn(csv_file, distance_type = "euclidean", p = None, k = 11, data = [], lati
   df.drop(columns = ['gravity'], inplace = True)
   df["weight"] /= 1000
 
+  # calculating distances
   n = len(df)
   distances = []
   for i in range(n):
@@ -48,6 +51,7 @@ def knn(csv_file, distance_type = "euclidean", p = None, k = 11, data = [], lati
       d = d**(1/p)
     distances.append((d, i))
 
+  # finding nearests and mean the results
   top_distances = sorted(distances)[:k]
   sum = 0
   results = []
@@ -63,39 +67,42 @@ def knn(csv_file, distance_type = "euclidean", p = None, k = 11, data = [], lati
 
   return json_object
 
-# st = time.time()
-# df = pd.read_csv("data/stat_acc_V3.csv", sep = ";")
-# df.drop(columns = ['Num_Acc', 'num_veh', 'id_usa', 'date', 'ville', 'id_code_insee', 'descr_cat_veh', 'descr_agglo', 'descr_athmo', 'descr_lum', 'descr_etat_surf', 'description_intersection', 'descr_dispo_secu', 'descr_grav', 'descr_motif_traj', 'descr_type_col', 'an_nais', 'place', 'dept', 'region', 'CODE_REG', 'weeks', 'month', 'days', 'intersection_num', 'motif_num', 'collision_num'], inplace = True)
-# df["weight"] /= 1000
 
-# X = df.drop('gravity', axis=1)
-# y = df['gravity']
+# calculating times
 
-# neigh = KNeighborsClassifier(n_neighbors=3)
-# neigh.fit(X, y)
-# d = {
-#   "latitude" : [47.633331],
-#   "longitude" : [6.86667],
-#   "age" : [21],
-#   "weight" : [1],
-#   "hours" : [14],
-#   "athmo_num" : [6],
-#   "etat_surf_num" : [7],
-#   "lum_num" : [4],
-#   "agglo_num" : [1]
-# }
-# test = pd.DataFrame(data=d)
-# print(neigh.predict(test))
+st = time.time()
+df = pd.read_csv("data/stat_acc_V3.csv", sep = ";")
+df.drop(columns = ['Num_Acc', 'num_veh', 'id_usa', 'date', 'ville', 'id_code_insee', 'descr_cat_veh', 'descr_agglo', 'descr_athmo', 'descr_lum', 'descr_etat_surf', 'description_intersection', 'descr_dispo_secu', 'descr_grav', 'descr_motif_traj', 'descr_type_col', 'an_nais', 'place', 'dept', 'region', 'CODE_REG', 'weeks', 'month', 'days', 'intersection_num', 'motif_num', 'collision_num'], inplace = True)
+df["weight"] /= 1000
 
-# et = time.time()
-# elapsed_time = et - st
-# print('Execution time:', elapsed_time, 'seconds')
+X = df.drop('gravity', axis=1)
+y = df['gravity']
 
-# st = time.time()
-# print(knn("data/stat_acc_V3.csv", distance_type = "euclidean", data = [47.633331, 6.86667, 21, 1, 14, 6, 7, 4, 1]))
-# et = time.time()
-# elapsed_time = et - st
-# print('Execution time:', elapsed_time, 'seconds')
+neigh = KNeighborsClassifier(n_neighbors=3)
+neigh.fit(X, y)
+d = {
+  "latitude" : [47.633331],
+  "longitude" : [6.86667],
+  "age" : [21],
+  "weight" : [1],
+  "hours" : [14],
+  "athmo_num" : [6],
+  "etat_surf_num" : [7],
+  "lum_num" : [4],
+  "agglo_num" : [1]
+}
+test = pd.DataFrame(data=d)
+print(neigh.predict(test))
+
+et = time.time()
+elapsed_time = et - st
+print('Execution time:', elapsed_time, 'seconds')
+
+st = time.time()
+print(knn("data/stat_acc_V3.csv", distance_type = "euclidean", data = [47.633331, 6.86667, 21, 1, 14, 6, 7, 4, 1]))
+et = time.time()
+elapsed_time = et - st
+print('Execution time:', elapsed_time, 'seconds')
 
 
 
@@ -107,48 +114,48 @@ df["weight"] /= 1000
 
 # holdout from scratch
 
-# X_base = df.drop('gravity', axis=1)
-# y_base = df['gravity']
-# X = [{}]*5
-# y = [{}]*5
-# for i in range(4):
-#   X_base, X[i], y_base, y[i] = train_test_split(X_base, y_base, test_size=1/(5-i))
-# X[4] = X_base
-# y[4] = y_base
+X_base = df.drop('gravity', axis=1)
+y_base = df['gravity']
+X = [{}]*5
+y = [{}]*5
+for i in range(4):
+  X_base, X[i], y_base, y[i] = train_test_split(X_base, y_base, test_size=1/(5-i))
+X[4] = X_base
+y[4] = y_base
 
-# scores = [0]*5
-# print(scores)
-# for i in range(5):
-#   print("=============")
-#   print(i)
-#   print("=============")
-#   X_train = pd.DataFrame()
-#   y_train = pd.DataFrame()
-#   for j in range(5):
-#     if j != i:
-#       X_train = pd.concat([X_train, X[j]])
-#       y_train = pd.concat([y_train, y[j]])
-#   neigh = KNeighborsClassifier(n_neighbors = 11)
-#   neigh.fit(X_train, y_train)
-#   for j in range(len(X[i])):
-#     test = neigh.predict(X[i].iloc[j].to_frame().transpose())
-#     scores[i] += abs(test-y[i].iloc[j])
-#   scores[i] /= len(X[i])
+scores = [0]*5
+print(scores)
+for i in range(5):
+  # print("=============")
+  # print(i)
+  # print("=============")
+  X_train = pd.DataFrame()
+  y_train = pd.DataFrame()
+  for j in range(5):
+    if j != i:
+      X_train = pd.concat([X_train, X[j]])
+      y_train = pd.concat([y_train, y[j]])
+  neigh = KNeighborsClassifier(n_neighbors = 11)
+  neigh.fit(X_train, y_train)
+  for j in range(len(X[i])):
+    test = neigh.predict(X[i].iloc[j].to_frame().transpose())
+    scores[i] += abs(test-y[i].iloc[j])
+  scores[i] /= len(X[i])
 
-# print(scores)
+print(scores)
 
 
 # holdout sklearn
 
-# X = df.drop('gravity', axis=1)
-# y = df['gravity']
+X = df.drop('gravity', axis=1)
+y = df['gravity']
 
-# neigh = KNeighborsClassifier(n_neighbors = 11)
+neigh = KNeighborsClassifier(n_neighbors = 11)
 
-# print(cross_val_score(neigh, X, y))
+print(cross_val_score(neigh, X, y))
 
 
-# leave one out from scratch
+# leave one out sklearn
 
 df2 = pd.DataFrame()
 
@@ -164,15 +171,17 @@ print(df2)
 X = df2.drop('gravity', axis=1)
 y = df2['gravity']
 
-# knn = KNeighborsClassifier(n_neighbors=11)
-# knn.fit(X, y)
+knn = KNeighborsClassifier(n_neighbors=11)
+knn.fit(X, y)
 
-# loo = LeaveOneOut()
+loo = LeaveOneOut()
 
-# scores = cross_val_score(knn, X, y, scoring='accuracy', cv=loo, n_jobs=-1)
+scores = cross_val_score(knn, X, y, scoring='accuracy', cv=loo, n_jobs=-1)
 
-# print(scores)
-# print(mean(scores))
+print(scores)
+print(mean(scores))
+
+# leave onr out from scratch
 
 def leave_one_out_accuracy(X, y, model):
   scores = []
