@@ -4,6 +4,7 @@ import collections
 import matplotlib.pyplot as plt
 import time
 import json
+from numpy import mean
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split, cross_val_score, LeaveOneOut
@@ -156,6 +157,36 @@ for g in [0, 2, 5, 10]:
   temp = temp[:int(len(temp)/10)]
   df2 = pd.concat([df2, temp])
 
+df2.reset_index(drop=True, inplace=True)
+
+print(df2)
+
 X = df2.drop('gravity', axis=1)
 y = df2['gravity']
 
+# knn = KNeighborsClassifier(n_neighbors=11)
+# knn.fit(X, y)
+
+# loo = LeaveOneOut()
+
+# scores = cross_val_score(knn, X, y, scoring='accuracy', cv=loo, n_jobs=-1)
+
+# print(scores)
+# print(mean(scores))
+
+def leave_one_out_accuracy(X, y, model):
+  scores = []
+  for i in range(len(X)):
+    # print(i)
+    X2 = X.drop(i)
+    y2 = y.drop(i)
+    model.fit(X2, y2)
+    test = model.predict([X.iloc[i]])
+    scores.append(int(test[0] ==y.iloc[i]))
+  return scores
+
+knn = KNeighborsClassifier(n_neighbors=11)
+scores = leave_one_out_accuracy(X, y, knn)
+
+print(scores)
+print(mean(scores))
