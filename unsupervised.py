@@ -26,27 +26,6 @@ def deg2rad(degrees):
     radians = degrees * pi / 180
     return radians
 
-# script sur l'apprentissage non supervisé de la fonctionnalité 4
-def appartient_cluster(lat,lon, clusters):
-    dist_table = []
-    cluster_index = 0
-    for j in range(len(clusters)): # 0 à k
-        dist = [math.sqrt((clusters[j][0]-lat)**2+(clusters[j][1]-lon)**2),cluster_index] # calculer la distance entre le point et le cluster j
-        cluster_index += 1
-        dist_table.append(dist)
-
-    min_dist = min(dist_table)
-    index = min_dist[1]
-
-    # créer un fichier json qui contient les coordonnées du cluster auquel appartient le point
-    aDict = {"lat_centroides":clusters[index][0], "lon_centroides":clusters[index][1]}
-    jsonString = json.dumps(aDict)
-    return jsonString
-    # jsonFile = open("cluster.json", "w")
-    # jsonFile.write(jsonString)
-    # jsonFile.close()
-
-
 def KMEANS(k,df, nb_iteration = 10,methode=3,mink=2):
 
     # get the first centroids coordinates

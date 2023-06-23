@@ -19,11 +19,9 @@ from sklearn.preprocessing import StandardScaler
 
 """Importer le fichier CSV"""
 
-from google.colab import drive
-drive.mount("/content/gdrive/")
 
-data = pd.read_csv("/content/gdrive/MyDrive/Projet_IA/data.csv", sep=";")
-data = pd.DataFrame(data)
+df = pd.read_csv('data/stat_acc_V3.csv', sep =";")  
+data = pd.DataFrame(df)
 
 """Préparation des données"""
 
@@ -65,106 +63,106 @@ Analayse en Composante Principale
 
 from sklearn.preprocessing import StandardScaler
 
-features = ['athmo_num', 'etat_surf_num', 'lum_num', 'weight', 'age']
-x = data.loc[:, features].values
-y = data.loc[:,['gravity']].values
+# features = ['athmo_num', 'etat_surf_num', 'lum_num', 'weight', 'age']
+# x = data.loc[:, features].values
+# y = data.loc[:,['gravity']].values
 
-scaler = StandardScaler()
-x = scaler.fit_transform(x)
+# scaler = StandardScaler()
+# x = scaler.fit_transform(x)
 
-from sklearn.decomposition import PCA
-pca = PCA(n_components=2)
-x_reduit = pca.fit_transform(x)
+# from sklearn.decomposition import PCA
+# pca = PCA(n_components=2)
+# x_reduit = pca.fit_transform(x)
 
-principalDf = pd.DataFrame(data = x_reduit, columns = ['principal component 1', 'principal component 2'])
-finalDf = pd.concat([principalDf, data[['gravity']]], axis = 1)
+# principalDf = pd.DataFrame(data = x_reduit, columns = ['principal component 1', 'principal component 2'])
+# finalDf = pd.concat([principalDf, data[['gravity']]], axis = 1)
 
 """Visualisation"""
 
 import matplotlib.pyplot as plt
 
-fig = plt.figure(figsize = (8,8))
-ax = fig.add_subplot(1,1,1)
-ax.set_xlabel('Principal Component 1', fontsize = 15)
-ax.set_ylabel('Principal Component 2', fontsize = 15)
-ax.set_title('2 component PCA', fontsize = 20)
+# fig = plt.figure(figsize = (8,8))
+# ax = fig.add_subplot(1,1,1)
+# ax.set_xlabel('Principal Component 1', fontsize = 15)
+# ax.set_ylabel('Principal Component 2', fontsize = 15)
+# ax.set_title('2 component PCA', fontsize = 20)
 
-targets = [2, 5, 10]
-colors = ['g', 'b', 'r']
-for target, color in zip(targets,colors):
-    indicesToKeep = finalDf['gravity'] == target
-    ax.scatter(finalDf.loc[indicesToKeep, 'principal component 1']
-               , finalDf.loc[indicesToKeep, 'principal component 2']
-               , c = color
-               , s = 50)
-ax.legend(targets)
-ax.grid()
+# targets = [2, 5, 10]
+# colors = ['g', 'b', 'r']
+# for target, color in zip(targets,colors):
+#     indicesToKeep = finalDf['gravity'] == target
+#     ax.scatter(finalDf.loc[indicesToKeep, 'principal component 1']
+#                , finalDf.loc[indicesToKeep, 'principal component 2']
+#                , c = color
+#                , s = 50)
+# ax.legend(targets)
+# ax.grid()
 
 """# Support Vector Machine"""
 
-from sklearn import svm
+# from sklearn import svm
 
-"""Détermination des paramètres optimaux"""
+# """Détermination des paramètres optimaux"""
 
-from sklearn.model_selection import GridSearchCV
+# from sklearn.model_selection import GridSearchCV
 
-parameters = {
-    'C': [1, 10],
-    'kernel': ['rbf'],
-    'max_iter': [1000, 2000]
-}
+# parameters = {
+#     'C': [1, 10],
+#     'kernel': ['rbf'],
+#     'max_iter': [1000, 2000]
+# }
 
-scaler = StandardScaler()
-x = scaler.fit_transform(x)
+# scaler = StandardScaler()
+# x = scaler.fit_transform(x)
 
-svc = svm.SVC()
-clf = GridSearchCV(svc, parameters)
-clf.fit(x_train, y_train)
+# svc = svm.SVC()
+# clf = GridSearchCV(svc, parameters)
+# clf.fit(x_train, y_train)
 
-#score d’échantillons bien classifiés sur le jeu de données de test
-print(clf.score(x_test, y_test)," ",clf.best_params_)
+# #score d’échantillons bien classifiés sur le jeu de données de test
+# print(clf.score(x_test, y_test)," ",clf.best_params_)
 
-svc = svm.SVC(C=1,kernel='rbf')
-svc.fit(x_train, y_train)
+# svc = svm.SVC(C=1,kernel='rbf')
+# svc.fit(x_train, y_train)
 
-y_pred = svc.predict(x_test)
+# y_pred = svc.predict(x_test)
 
-#score d’échantillons bien classifiés sur le jeu de données de test
-score_svc = accuracy_score(y_test, y_pred)
-print(score_svc)
+# #score d’échantillons bien classifiés sur le jeu de données de test
+# score_svc = accuracy_score(y_test, y_pred)
+# print(score_svc)
 
 """# Random forest"""
 
-from sklearn.ensemble import RandomForestClassifier
+# from sklearn.ensemble import RandomForestClassifier
 
-"""Détermination des paramètres optimaux"""
+# """Détermination des paramètres optimaux"""
 
 from sklearn.model_selection import GridSearchCV
 
-parameters = {
-    'bootstrap': [True,False],
-    'max_features': ['sqrt'],
-    'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
-    'min_samples_leaf': [2, 5, 10],
-    'min_samples_split': [2, 5, 10],
-    'n_estimators': [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]
-}
+# parameters = {
+#     'bootstrap': [True,False],
+#     'max_features': ['sqrt'],
+#     'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
+#     'min_samples_leaf': [2, 5, 10],
+#     'min_samples_split': [2, 5, 10],
+#     'n_estimators': [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]
+# }
 
-raf = RandomForestClassifier()
-clf = GridSearchCV(raf, parameters)
-clf.fit(x_train, y_train)
+# raf = RandomForestClassifier()
+# clf = GridSearchCV(raf, parameters)
+# clf.fit(x_train, y_train)
 
-#score d’échantillons bien classifiés sur le jeu de données de test
-print(clf.score(x_test, y_test)," ",clf.best_params_)
+# #score d’échantillons bien classifiés sur le jeu de données de test
+# print(clf.score(x_test, y_test)," ",clf.best_params_)
 
-raf = RandomForestClassifier()
-raf.fit(x_train, y_train)
+# raf = RandomForestClassifier()
+# raf.fit(x_train, y_train)
 
-y_pred = raf.predict(x_test)
+# y_pred = raf.predict(x_test)
 
-#score d’échantillons bien classifiés sur le jeu de données de test
-score_raf = accuracy_score(y_test, y_pred)
-print(score_raf)
+# #score d’échantillons bien classifiés sur le jeu de données de test
+# score_raf = accuracy_score(y_test, y_pred)
+# print(score_raf)
 
 """# Multilayer Perceptron"""
 
@@ -174,8 +172,45 @@ from sklearn.linear_model import Perceptron
 
 from sklearn.model_selection import GridSearchCV
 
+# parameters = {
+#     'tol': [1e-3,1e-4,1e-5,1e-6]
+# }
+
+# per = Perceptron()
+# clf = GridSearchCV(per, parameters)
+# clf.fit(x_train, y_train)
+
+# #score d’échantillons bien classifiés sur le jeu de données de test
+# print(clf.score(x_test, y_test)," ",clf.best_params_)
+
+# per = Perceptron(tol=1e-3)
+# per.fit(x_train, y_train)
+
+# y_pred = per.predict(x_test)
+
+# #score d’échantillons bien classifiés sur le jeu de données de test
+# score_per = accuracy_score(y_test, y_pred)
+# print(score_per)
+
+# """# Comparaison des modèles"""
+
+# score_max = max([score_svc, score_raf, score_per])
+# if score_max == score_svc:
+#   print("Le meilleur modèle est Support Vector Machine")
+# elif score_max == score_raf:
+#   print("Le meilleur modèle est Random Forest")
+# else:
+#   print("Le meilleur modèle est Multilayer Perceptron")
+# print(score_max,"% des prédictions sont bonnes")
+
+from sklearn.model_selection import GridSearchCV
+
 parameters = {
-    'tol': [1e-3,1e-4,1e-5,1e-6]
+    'hidden_layer_sizes': [(50,50,50), (50,100,50), (100,)],
+    'activation': ['tanh', 'relu'],
+    'solver': ['sgd', 'adam'],
+    'alpha': [0.0001, 0.05],
+    'learning_rate': ['constant','adaptive']
 }
 
 per = Perceptron()
@@ -184,23 +219,3 @@ clf.fit(x_train, y_train)
 
 #score d’échantillons bien classifiés sur le jeu de données de test
 print(clf.score(x_test, y_test)," ",clf.best_params_)
-
-per = Perceptron(tol=1e-3)
-per.fit(x_train, y_train)
-
-y_pred = per.predict(x_test)
-
-#score d’échantillons bien classifiés sur le jeu de données de test
-score_per = accuracy_score(y_test, y_pred)
-print(score_per)
-
-"""# Comparaison des modèles"""
-
-score_max = max([score_svc, score_raf, score_per])
-if score_max == score_svc:
-  print("Le meilleur modèle est Support Vector Machine")
-elif score_max == score_raf:
-  print("Le meilleur modèle est Random Forest")
-else:
-  print("Le meilleur modèle est Multilayer Perceptron")
-print(score_max,"% des prédictions sont bonnes")
