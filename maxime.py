@@ -151,7 +151,7 @@ def metrics_test(df):
     path_davies1 = 'export/davies_sklearn.png'
     path_davies2 = 'export/davies_scratch.png'
 
-    for i in range(6):
+    for i in range(20):
         kmeans = KMeans(n_clusters=i+2, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
         silouhette = silhouette_score(df[["latitude","longitude"]], kmeans.labels_)
         plt.plot(i+2,silouhette,'-gs')
@@ -159,16 +159,16 @@ def metrics_test(df):
     plt.savefig(path_silouhette1)
     plt.close()
 
-    for i in range(6):
-        result = KMEANS(i+2,df, nb_iteration=10,methode=1)
-        labels = result[1]
-        silouhette = silhouette_score(df[["latitude","longitude"]], labels)
-        plt.plot(i+2,silouhette,'-gs')
-    plt.ylabel('score silouette')
-    plt.savefig(path_silouhette2)
-    plt.close()
+    # for i in range(6):
+    #     result = KMEANS(i+2,df, nb_iteration=10,methode=1)
+    #     labels = result[1]
+    #     silouhette = silhouette_score(df[["latitude","longitude"]], labels)
+    #     plt.plot(i+2,silouhette,'-gs')
+    # plt.ylabel('score silouette')
+    # plt.savefig(path_silouhette2)
+    # plt.close()
     print("silouhette ok")
-    for i in range(6):
+    for i in range(20):
         kmeans = KMeans(n_clusters=i+2, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
         calinski = calinski_harabasz_score(df[["latitude","longitude"]], kmeans.labels_)
         print("calinski score : ", calinski)
@@ -177,17 +177,17 @@ def metrics_test(df):
     plt.savefig(path_calinski1)
     plt.close()
 
-    for i in range(6):
-        result = KMEANS(i+2,df, nb_iteration=10,methode=1)
-        labels = result[1]
-        calinski = calinski_harabasz_score(df[["latitude","longitude"]], labels)
-        plt.plot(i+2,calinski,'-gs')
-    plt.ylabel('score calinski')
-    plt.savefig(path_calinski2)
-    plt.close()
+    # for i in range(6):
+    #     result = KMEANS(i+2,df, nb_iteration=10,methode=1)
+    #     labels = result[1]
+    #     calinski = calinski_harabasz_score(df[["latitude","longitude"]], labels)
+    #     plt.plot(i+2,calinski,'-gs')
+    # plt.ylabel('score calinski')
+    # plt.savefig(path_calinski2)
+    # plt.close()
     print("calinski ok")
 
-    for i in range(6):
+    for i in range(20):
         kmeans = KMeans(n_clusters=i+2, random_state=0, n_init="auto").fit(df[["latitude","longitude"]])
         davies = davies_bouldin_score(df[["latitude","longitude"]], kmeans.labels_)
         plt.plot(i+2,davies,'-gs')
@@ -195,25 +195,25 @@ def metrics_test(df):
     plt.savefig(path_davies1)
     plt.close()
 
-    for i in range(6):
-        result = KMEANS(i+2,df, nb_iteration=10,methode=1)
-        labels = result[1]
-        davies = davies_bouldin_score(df[["latitude","longitude"]], labels)
-        plt.plot(i+2,davies,'-gs')
-    plt.ylabel('score davies')
-    plt.savefig(path_davies2)
-    plt.close()
+    # for i in range(6):
+    #     result = KMEANS(i+2,df, nb_iteration=10,methode=1)
+    #     labels = result[1]
+    #     davies = davies_bouldin_score(df[["latitude","longitude"]], labels)
+    #     plt.plot(i+2,davies,'-gs')
+    # plt.ylabel('score davies')
+    # plt.savefig(path_davies2)
+    # plt.close()
     print("davies ok")
 
 # fit data
-# df = pd.read_csv('data/stat_acc_V3.csv', sep =";")  
-# print("data loaded !")  
-# df = fit_departement(df)
-# print("data fitted !")
+df = pd.read_csv('data/stat_acc_V3.csv', sep =";")  
+print("data loaded !")  
+df = fit_departement(df)
+print("data fitted !")
 
 # faire les tests de metrics
 
-# metrics_test(df)
+metrics_test(df)
 
 # afficher les clusters sur les maps
 
@@ -251,3 +251,7 @@ def metrics_test(df):
 # print('Execution time manual:', elapsed_time, 'seconds')
 
 
+# print(df["id_usa"].value_counts())
+
+
+# axes = df.boxplot(column='id_usa', by='hairpattern')
